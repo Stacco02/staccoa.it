@@ -18,40 +18,60 @@
     <div class="form-container">
         <h2>Registrati</h2>
         <form id="registerForm">
-            <input type="text" id="firstName" placeholder="Nome" required>
-            <input type="text" id="lastName" placeholder="Cognome" required>
+            <input type="text" id="nome" placeholder="Nome" required>
+            <input type="text" id="cognome" placeholder="Cognome" required>
             <input type="email" id="email" placeholder="Email" required>
             <input type="password" id="password" placeholder="Password" required>
             <input type="password" id="confirmPassword" placeholder="Ripeti password" required>
-            <button type="button" class="small-btn" onclick="sendVerification()">Invia codice di verifica</button>
-            <input type="text" id="verificationCode" placeholder="Codice di verifica" required>
-            <button type="submit">Registrati</button>
+            <button type="button" class="small-btn" onclick="inviaCodice()">Invia codice</button>
+            <input type="text" id="codice" placeholder="Codice di verifica" required>
+            <button type="button" onclick="verificaCodice()">Registrati</button>
         </form>
         <a href="login.html">Hai già un account? Accedi</a>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
     <script>
-        function sendVerification() {
-            // genera un codice di verifica casuale di 6 cifre
-            const code = Math.floor(100000 + Math.random() * 900000);
-            alert('Codice di verifica: ' + code + '\n(Questa è una simulazione. Configura un servizio email per inviare codici reali.)');
-            window.generatedCode = code;
-        }
-        document.getElementById('registerForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            if (password !== confirmPassword) {
-                alert('Le password non coincidono.');
+        (function(){
+            emailjs.init("Ly1htnuMhv50Q9SZP");
+        })();
+
+        function inviaCodice() {
+            const email = document.getElementById('email').value;
+            const nome = document.getElementById('nome').value;
+            if (!email || !nome) {
+                alert("Compila prima nome e email.");
                 return;
             }
-            const enteredCode = document.getElementById('verificationCode').value;
-            if (window.generatedCode && parseInt(enteredCode) === window.generatedCode) {
-                alert('Registrazione completata! (Simulazione)');
-                // In produzione, invia i dati al server e completa la registrazione
-            } else {
-                alert('Codice di verifica non valido.');
+            const code = Math.floor(100000 + Math.random() * 900000);
+            const expiry = new Date(Date.now() + 15 * 60000).toLocaleTimeString();
+
+            emailjs.send("service_anwhxvj", "template_q3snn7b", {
+                to_name: nome,
+                email: email,
+                passcode: code,
+                time: expiry
+            }).then(() => {
+                alert("Codice inviato alla tua email!");
+                window.generatedCode = code;
+            }).catch((err) => {
+                alert("Errore nell'invio del codice: " + JSON.stringify(err));
+            });
+        }
+
+        function verificaCodice() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const entered = document.getElementById('codice').value;
+            if (password !== confirmPassword) {
+                alert("Le password non coincidono.");
+                return;
             }
-        });
+            if (entered && parseInt(entered) === window.generatedCode) {
+                alert("Registrazione completata!");
+            } else {
+                alert("Codice errato o non inviato.");
+            }
+        }
     </script>
 </body>
 </html>
