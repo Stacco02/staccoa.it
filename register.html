@@ -5,24 +5,53 @@
     <title>Registrazione - Staccoa.it</title>
     <style>
         body { background-color: #000; color: #fff; font-family: Arial, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; }
-        .form-container { background-color: #111; padding: 40px; border-radius: 8px; box-shadow: 0 0 10px rgba(255, 255, 255, 0.1); width: 300px; }
+        .form-container { background-color: #111; padding: 40px; border-radius: 8px; box-shadow: 0 0 10px rgba(255,255,255,0.1); width: 350px; }
         .form-container h2 { margin-bottom: 20px; }
         .form-container input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 4px; border: none; }
         .form-container button { width: 100%; background-color: #ff6600; color: #fff; padding: 12px; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
         .form-container button:hover { background-color: #e65c00; }
         .form-container a { color: #ff6600; text-decoration: none; display: block; margin-top: 10px; text-align: center; }
+        .form-container .small-btn { width: auto; margin-top: 0; margin-bottom: 10px; }
     </style>
 </head>
 <body>
     <div class="form-container">
-        <h2>Crea un account</h2>
-        <form>
-            <input type="text" placeholder="Nome utente" required>
-            <input type="email" placeholder="Email" required>
-            <input type="password" placeholder="Password" required>
+        <h2>Registrati</h2>
+        <form id="registerForm">
+            <input type="text" id="firstName" placeholder="Nome" required>
+            <input type="text" id="lastName" placeholder="Cognome" required>
+            <input type="email" id="email" placeholder="Email" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <input type="password" id="confirmPassword" placeholder="Ripeti password" required>
+            <button type="button" class="small-btn" onclick="sendVerification()">Invia codice di verifica</button>
+            <input type="text" id="verificationCode" placeholder="Codice di verifica" required>
             <button type="submit">Registrati</button>
         </form>
         <a href="login.html">Hai già un account? Accedi</a>
     </div>
+    <script>
+        function sendVerification() {
+            // genera un codice di verifica casuale di 6 cifre
+            const code = Math.floor(100000 + Math.random() * 900000);
+            alert('Codice di verifica: ' + code + '\n(Questa è una simulazione. Configura un servizio email per inviare codici reali.)');
+            window.generatedCode = code;
+        }
+        document.getElementById('registerForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            if (password !== confirmPassword) {
+                alert('Le password non coincidono.');
+                return;
+            }
+            const enteredCode = document.getElementById('verificationCode').value;
+            if (window.generatedCode && parseInt(enteredCode) === window.generatedCode) {
+                alert('Registrazione completata! (Simulazione)');
+                // In produzione, invia i dati al server e completa la registrazione
+            } else {
+                alert('Codice di verifica non valido.');
+            }
+        });
+    </script>
 </body>
 </html>
