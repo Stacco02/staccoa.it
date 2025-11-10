@@ -4,28 +4,28 @@
     <meta charset="UTF-8">
     <title>Registrazione - Staccoa.it</title>
     <style>
-        body { background-color: #000; color: #fff; font-family: Arial, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; }
-        .form-container { background-color: #111; padding: 40px; border-radius: 8px; box-shadow: 0 0 10px rgba(255,255,255,0.1); width: 350px; }
+        body { background-color: #000; color: #fff; font-family: Arial, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin:0; }
+        .form-container { background-color: #111; padding: 40px; border-radius: 8px; box-shadow: 0 0 10px rgba(255,255,255,0.1); width: 320px; }
         .form-container h2 { margin-bottom: 20px; }
         .form-container input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 4px; border: none; }
         .form-container button { width: 100%; background-color: #ff6600; color: #fff; padding: 12px; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
         .form-container button:hover { background-color: #e65c00; }
         .form-container a { color: #ff6600; text-decoration: none; display: block; margin-top: 10px; text-align: center; }
-        .form-container .small-btn { width: auto; margin-top: 0; margin-bottom: 10px; }
+        .small-btn { width: auto; margin-top: 10px; }
     </style>
 </head>
 <body>
     <div class="form-container">
         <h2>Registrati</h2>
-        <form id="registerForm">
+        <form id="registerForm" onsubmit="verificaCodice(event)">
             <input type="text" id="nome" placeholder="Nome" required>
             <input type="text" id="cognome" placeholder="Cognome" required>
             <input type="email" id="email" placeholder="Email" required>
             <input type="password" id="password" placeholder="Password" required>
             <input type="password" id="confirmPassword" placeholder="Ripeti password" required>
-            <button type="button" class="small-btn" onclick="inviaCodice()">Invia codice</button>
             <input type="text" id="codice" placeholder="Codice di verifica" required>
-            <button type="button" onclick="verificaCodice()">Registrati</button>
+            <button type="button" class="small-btn" onclick="inviaCodice()">Invia codice</button>
+            <button type="submit">Registrati</button>
         </form>
         <a href="login.html">Hai già un account? Accedi</a>
     </div>
@@ -34,42 +34,37 @@
         (function(){
             emailjs.init("Ly1htnuMhv50Q9SZP");
         })();
-
         function inviaCodice() {
             const email = document.getElementById('email').value;
             const nome = document.getElementById('nome').value;
-            if (!email || !nome) {
-                alert("Compila prima nome e email.");
-                return;
-            }
-            const code = Math.floor(100000 + Math.random() * 900000);
-            const expiry = new Date(Date.now() + 15 * 60000).toLocaleTimeString();
-
+            const codice = Math.floor(100000 + Math.random() * 900000);
+            const scadenza = new Date(Date.now() + 15 * 60000).toLocaleTimeString();
             emailjs.send("service_anwhxvj", "template_q3snn7b", {
                 to_name: nome,
                 email: email,
-                passcode: code,
-                time: expiry
+                passcode: codice,
+                time: scadenza
             }).then(() => {
                 alert("Codice inviato alla tua email!");
-                window.generatedCode = code;
+                window.generatedCode = String(codice);
             }).catch((err) => {
                 alert("Errore nell'invio del codice: " + JSON.stringify(err));
             });
         }
-
-        function verificaCodice() {
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            const entered = document.getElementById('codice').value;
-            if (password !== confirmPassword) {
+        function verificaCodice(event) {
+            event.preventDefault();
+            const inserted = document.getElementById('codice').value;
+            const pass = document.getElementById('password').value;
+            const confirmPass = document.getElementById('confirmPassword').value;
+            if (pass !== confirmPass) {
                 alert("Le password non coincidono.");
                 return;
             }
-            if (entered && parseInt(entered) === window.generatedCode) {
+            if (inserted === window.generatedCode) {
                 alert("Registrazione completata!");
+                window.location.href = 'index.html';
             } else {
-                alert("Codice errato o non inviato.");
+                alert("Codice errato o scaduto.");
             }
         }
     </script>
