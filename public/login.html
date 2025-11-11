@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Accedi – Staccoa.it</title>
+    <style>
+        body { background-color: #000; color: #fff; font-family: Arial, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .form-container { background-color: #111; padding: 40px; border-radius: 8px; box-shadow: 0 0 10px rgba(255,255,255,0.1); width: 300px; }
+        .form-container h2 { margin-bottom: 20px; text-align: center; }
+        .form-container input { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 4px; border: none; }
+        .form-container button { width: 100%; background-color: #ff6600; color: #fff; padding: 12px; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
+        .form-container button:hover { background-color: #e65c00; }
+        .form-container a { color: #ff6600; text-decoration: none; display: block; margin-top: 10px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Accedi</h2>
+        <form id="loginForm" onsubmit="login(event)">
+            <input type="email" id="email" placeholder="Email" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="submit">Accedi</button>
+        </form>
+        <a href="register.html">Non hai un account? Registrati</a>
+    </div>
+    <script>
+        async function login(event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.message || 'Credenziali non valide.');
+                }
+                window.location.href = 'home.html';
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        async function checkSession() {
+            try {
+                const response = await fetch('/api/session');
+                const data = await response.json();
+                if (data.authenticated) {
+                    window.location.href = 'home.html';
+                }
+            } catch (error) {
+                console.error('Errore nel controllo sessione', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', checkSession);
+    </script>
+</body>
+</html>

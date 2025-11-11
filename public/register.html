@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Registrazione - Staccoa.it</title>
+    <style>
+        body { background-color: #000; color: #fff; font-family: Arial, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .form-container { background-color: #111; padding: 40px; border-radius: 8px; box-shadow: 0 0 10px rgba(255,255,255,0.1); width: 320px; }
+        .form-container h2 { margin-bottom: 20px; text-align: center; }
+        .form-container input { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 4px; border: none; }
+        .form-container button { width: 100%; background-color: #ff6600; color: #fff; padding: 12px; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
+        .form-container button:hover { background-color: #e65c00; }
+        .form-container a { color: #ff6600; text-decoration: none; display: block; margin-top: 10px; text-align: center; }
+        .small-btn { width: auto; margin-top: 10px; display: inline-block; }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Registrati</h2>
+        <form id="registerForm" onsubmit="verificaCodice(event)">
+            <input type="text" id="nome" placeholder="Nome" required>
+            <input type="text" id="cognome" placeholder="Cognome" required>
+            <input type="email" id="email" placeholder="Email" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <input type="password" id="confirmPassword" placeholder="Ripeti password" required>
+            <div style="display:flex; gap:10px;">
+              <input type="text" id="codice" placeholder="Codice di verifica" required style="flex:1;">
+              <button type="button" class="small-btn" onclick="inviaCodice()">Invia codice</button>
+            </div>
+            <button type="submit">Registrati</button>
+        </form>
+        <a href="login.html">Hai già un account? Accedi</a>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+    <script>
+        (function(){
+            emailjs.init("Ly1htnuMhv50Q9SZP");
+        })();
+
+        async function inviaCodice() {
+            const email = document.getElementById('email').value;
+            const nome = document.getElementById('nome').value;
+            if (!email || !nome) {
+                alert("Inserisci nome ed email prima di richiedere il codice.");
+                return;
+            }
+            const codice = Math.floor(100000 + Math.random() * 900000);
+            const scadenza = new Date(Date.now() + 15 * 60000).toLocaleTimeString();
+            try {
+                await emailjs.send("service_anwhxvj", "template_q3snn7b", {
+                    to_name: nome,
+                    email: email,
+                    passcode: codice,
+                    time: scadenza
+                });
+                alert("Codice inviato alla tua email!");
+                window.generatedCode = String(codice);
+            } catch (err) {
+                alert("Errore nell'invio del codice: " + JSON.stringify(err));
+            }
+        }
+
+        async function registraUtente(payload) {
+            const response = await fetch('/api/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.message || 'Registrazione non riuscita');
+            }
+            return data;
+        }
+
+        async function verificaCodice(event) {
+            event.preventDefault();
+            const inserted = document.getElementById('codice').value;
+            const nome = document.getElementById('nome').value;
+            const cognome = document.getElementById('cognome').value;
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('password').value;
+            const confirmPass = document.getElementById('confirmPassword').value;
+
+            if (pass !== confirmPass) {
+                alert("Le password non coincidono.");
+                return;
+            }
+            if (!window.generatedCode || inserted !== window.generatedCode) {
+                alert("Codice errato o scaduto.");
+                return;
+            }
+
+            try {
+                await registraUtente({ nome, cognome, email, password: pass });
+                window.location.href = 'home.html';
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+    </script>
+</body>
+</html>

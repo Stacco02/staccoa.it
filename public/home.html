@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Benvenuto - Staccoa.it</title>
+  <style>
+    body { background-color: #000; color: #fff; font-family: Arial, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+    .container { text-align: center; }
+    .container h1 { color: #ff6600; }
+    a { color: #ff6600; text-decoration: none; margin-top: 20px; display: block; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Benvenuto su Staccoa.it!</h1>
+    <p id="userInfo">Caricamento informazioni utente...</p>
+    <button onclick="logout()" style="margin-top:20px;background:#ff6600;color:#fff;padding:10px 20px;border:none;border-radius:4px;cursor:pointer;">Esci</button>
+    <a href="index.html">Torna alla pagina principale</a>
+  </div>
+  <script>
+    async function fetchSession() {
+      try {
+        const response = await fetch('/api/session');
+        const data = await response.json();
+        if (!data.authenticated) {
+          window.location.href = 'login.html';
+          return;
+        }
+        const userInfo = document.getElementById('userInfo');
+        if (data.user && data.user.nome) {
+          userInfo.textContent = `Ciao ${data.user.nome}, l'accesso è attivo.`;
+        } else {
+          userInfo.textContent = 'Accesso verificato.';
+        }
+      } catch (error) {
+        console.error('Errore sessione', error);
+        window.location.href = 'login.html';
+      }
+    }
+
+    async function logout() {
+      try {
+        await fetch('/api/logout', { method: 'POST' });
+      } finally {
+        window.location.href = 'login.html';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', fetchSession);
+  </script>
+</body>
+</html>
