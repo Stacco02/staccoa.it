@@ -4,16 +4,23 @@
     <meta charset="UTF-8">
     <title>Staccoa.it</title>
     <style>
-        body { background-color: #000; color: #fff; font-family: Arial, sans-serif; text-align: center; padding-top: 100px; }
-        .container { max-width: 600px; margin: auto; }
+        body { background-color: #000; color: #fff; font-family: Arial, sans-serif; text-align: center; padding-top: 80px; }
+        .container { max-width: 640px; margin: auto; }
         .button { background-color: #ff6600; color: #fff; padding: 15px 30px; margin: 10px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; text-decoration: none; display: inline-block; }
         .button:hover { background-color: #e65c00; }
+        .hero-logo { margin:40px auto; display:block; width:360px; max-width:80%; animation: heroFade 1.2s ease-out forwards; opacity:0; transform: translateY(10px) scale(0.98); }
+        @keyframes heroFade {
+            0% { opacity:0; transform: translateY(30px) scale(0.9); }
+            60% { opacity:1; transform: translateY(-5px) scale(1.02); }
+            100% { opacity:1; transform: translateY(0) scale(1); }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Benvenuto su Staccoa.it</h1>
         <p>Qui puoi registrarti o accedere al tuo account.</p>
+        <img src="assets/staccoalogo.png" alt="Logo Staccoa" class="hero-logo">
         <a href="register.html" class="button">Registrati</a>
         <a href="login.html" class="button">Accedi</a>
     </div>
